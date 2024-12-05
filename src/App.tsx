@@ -1,13 +1,14 @@
-import './App.css'
-import DirectoryTree from './DirectoryTree'
+import './App.css';
+import DirectoryTree from './DirectoryTree';
+import GPTTest from './GPTTest';
 
 function App() {
-
   return (
     <>
-     <DirectoryTree/>
+      <DirectoryTree />
+      <GPTTest />
     </>
-  )
+  );
 }
 
-export default App
+export default App;
