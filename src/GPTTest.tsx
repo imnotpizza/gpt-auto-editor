@@ -20,7 +20,7 @@ export default function GPTTest() {
   const callApi = async () => {
     const completion = await openai.chat.completions.create({
       model: 'gpt-4o',
-      messages: [{ role: 'user', content: 'what is 1+1' }],
+      messages: [{ role: 'user', content: 'explain abount Chatgpt' }],
     });
 
     console.log('completion', completion);
