@@ -1,4 +1,3 @@
-// SelectEditFilePage.js
 import React, { useState } from 'react';
 import { Button, Tree, message } from 'antd';
 import { usePage } from './PageContext';
@@ -34,7 +33,6 @@ const SelectEditFilePage = () => {
           title: name,
           key: handle.name,
           isLeaf: true,
-          handle,
         });
       }
     }
@@ -46,9 +44,13 @@ const SelectEditFilePage = () => {
   };
 
   const handleComplete = () => {
+    if (checkedKeys.length === 0) {
+      message.error('Please select at least one file.');
+      return;
+    }
     localStorage.setItem('selectedFiles', JSON.stringify(checkedKeys));
     message.success('Files saved to local storage!');
-    setCurrentPage('editor');
+    setCurrentPage('editor'); // Navigate to the editor
   };
 
   return (
