@@ -1,14 +1,25 @@
-import './App.css';
-import DirectoryTree from './DirectoryTree';
-import GPTTest from './GPTTest';
+// App.js
+import { PageProvider, usePage } from './pages/PageContext';
+import AddProjectPage from './pages/AddProjectPage';
+import SelectEditFilePage from './pages/SelectEditFilePage';
+import EditorPage from './pages/EditorPage';
 
-function App() {
+const App = () => {
+  const { currentPage } = usePage();
+
   return (
-    <>
-      <DirectoryTree />
-      <GPTTest />
-    </>
+    <div style={{ padding: '20px' }}>
+      {currentPage === 'addProject' && <AddProjectPage />}
+      {currentPage === 'selectEditFile' && <SelectEditFilePage />}
+      {currentPage === 'editor' && <EditorPage />}
+    </div>
   );
-}
+};
 
-export default App;
+const AppWithContext = () => (
+  <PageProvider>
+    <App />
+  </PageProvider>
+);
+
+export default AppWithContext;

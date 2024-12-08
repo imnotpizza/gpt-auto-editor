@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button, Tree, message } from 'antd';
 import TextArea from 'antd/es/input/TextArea';
 
@@ -26,7 +26,7 @@ const DirectoryTreeWithWriteFeature = () => {
     }
   };
 
-  const buildTree = async (directoryHandle) => {
+  const buildTree = async (directoryHandle: FileSystemDirectoryHandle) => {
     const children = [];
     for await (const [name, handle] of directoryHandle.entries()) {
       if (handle.kind === 'directory') {
