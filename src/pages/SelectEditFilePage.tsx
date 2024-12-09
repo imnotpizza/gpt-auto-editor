@@ -1,19 +1,18 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Button, Tree, message } from 'antd';
 import TextArea from 'antd/es/input/TextArea';
 
 /**
- * 파일 디렉토리 선택 기능
- * TODO: gpt 인식에 문제있을 경우, \n 등 불필요 문자 제거 로직 필요
- * 
+ * SelectEditFilePage: 파일 디렉토리 선택, 파일 내용 편집 및 저장 기능을 제공하는 페이지.
  */
-const DirectoryTreeWithWriteFeature = () => {
+const SelectEditFilePage = () => {
   const [treeData, setTreeData] = useState([]);
   const [checkedKeys, setCheckedKeys] = useState([]);
   const [fileContentMap, setFileContentMap] = useState(new Map());
   const [selectedFileContent, setSelectedFileContent] = useState('');
   const [selectedFileName, setSelectedFileName] = useState('');
 
+  // 디렉토리 선택 처리
   const handleDirectoryPicker = async () => {
     try {
       const directoryHandle = await window.showDirectoryPicker();
@@ -26,19 +25,20 @@ const DirectoryTreeWithWriteFeature = () => {
     }
   };
 
-  const buildTree = async (directoryHandle: FileSystemDirectoryHandle) => {
+  // 디렉토리 구조를 트리 데이터로 변환
+  const buildTree = async (directoryHandle) => {
     const children = [];
     for await (const [name, handle] of directoryHandle.entries()) {
       if (handle.kind === 'directory') {
         children.push({
           title: name,
-          key: handle.name,
+          key: `${directoryHandle.name}/${name}`,
           children: await buildTree(handle),
         });
       } else if (handle.kind === 'file') {
         children.push({
           title: name,
-          key: handle.name,
+          key: `${directoryHandle.name}/${name}`,
           isLeaf: true,
           handle,
         });
@@ -47,7 +47,8 @@ const DirectoryTreeWithWriteFeature = () => {
     return children;
   };
 
-  const onCheck = (checkedKeysValue, { checkedNodes }) => {
+  // 파일 선택 및 내용 읽기
+  const onCheck = async (checkedKeysValue, { checkedNodes }) => {
     setCheckedKeys(checkedKeysValue);
 
     const fileMap = new Map();
@@ -56,31 +57,29 @@ const DirectoryTreeWithWriteFeature = () => {
       .map(async (node) => {
         const file = await node.handle.getFile();
         const content = await file.text();
-        fileMap.set(file.name, { content, handle: node.handle });
+        fileMap.set(node.key, { content, handle: node.handle });
       });
 
-    Promise.all(filePromises)
-      .then(() => {
-        setFileContentMap(fileMap);
-        message.success('Selected files loaded successfully!');
-      })
-      .catch((error) => {
-        console.error('Error reading files:', error);
-        message.error('Failed to load file contents.');
-      });
+    await Promise.all(filePromises);
+    setFileContentMap(fileMap);
+    message.success('Selected files loaded successfully!');
   };
 
-  const onFileSelect = (fileName) => {
-    if (fileContentMap.has(fileName)) {
-      setSelectedFileName(fileName);
-      setSelectedFileContent(fileContentMap.get(fileName).content);
+  // 특정 파일 선택 시 내용 표시
+  const onFileSelect = (fileKey) => {
+    if (fileContentMap.has(fileKey)) {
+      const fileData = fileContentMap.get(fileKey);
+      setSelectedFileName(fileKey);
+      setSelectedFileContent(fileData.content);
     }
   };
 
+  // 텍스트 영역 내용 변경
   const handleContentChange = (e) => {
     setSelectedFileContent(e.target.value);
   };
 
+  // 파일 내용 저장
   const handleWriteToFile = async () => {
     if (!selectedFileName) {
       message.warning('No file selected.');
@@ -93,7 +92,7 @@ const DirectoryTreeWithWriteFeature = () => {
       await writableStream.write(selectedFileContent);
       await writableStream.close();
 
-      // 업데이트된 내용을 Map에도 반영
+      // 업데이트된 내용을 Map에 반영
       fileContentMap.set(selectedFileName, {
         ...fileInfo,
         content: selectedFileContent,
@@ -138,16 +137,16 @@ const DirectoryTreeWithWriteFeature = () => {
             onClick={handleWriteToFile}
             disabled={!selectedFileName}
           >
-            Write to File
+            Save File
           </Button>
         </div>
       </div>
       <div style={{ marginTop: '20px' }}>
-        <h3>Selected File Contents (Map):</h3>
+        <h3>Selected File Contents:</h3>
         <pre>{JSON.stringify(Object.fromEntries(fileContentMap), null, 2)}</pre>
       </div>
     </div>
   );
 };
 
-export default DirectoryTreeWithWriteFeature;
+export default SelectEditFilePage;
