@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Button } from 'antd';
+import { Button, message } from 'antd';
 import TextArea from 'antd/es/input/TextArea';
 import OpenAI from 'openai';
 
@@ -82,9 +82,17 @@ const EditorPage = () => {
     }
   };
 
+  const clearStorage = () => {
+    localStorage.clear();
+    message.success('storage has cleared');
+  }
+
   return (
     <div style={{ padding: '20px' }}>
       <h2>GPT Prompt Test</h2>
+      <Button
+        onClick={clearStorage}
+      >clear storage</Button>
       <div>
         <h3>Selected Files:</h3>
         <ul>
