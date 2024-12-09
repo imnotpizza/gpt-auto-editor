@@ -60,11 +60,10 @@ const SelectEditFilePage = () => {
     const selectedFiles = checkedKeys.map((key) => {
       console.log('### key', checkedKeys)
       const fileName = key.split('/').pop(); // 경로에서 파일명 추출
-      return { fileName, url: key };
+      return { fileName, url: rootPath+key };
     });
     localStorage.setItem('selectedFiles', JSON.stringify(selectedFiles));
     localStorage.setItem('rootPath', rootPath);
-    return;
     message.success('Files saved to local storage!');
     setCurrentPage('editor'); // Navigate to the editor
   };

@@ -59,7 +59,10 @@ const EditorPage = () => {
 
       // 모든 파일 내용 읽기
       const fileContentsPromises = selectedFiles.map(async (file) => {
-        const content = await readFileContent(file.absolutePath);
+        console.log('### file.url', file.url)
+        // TODO: nodejs 사용해야할듯
+        const content = await readFileContent(file.url);
+        console.log('#### content', content)
         return `\n\n--- File: ${file.fileName} ---\n${content}`;
       });
 
@@ -67,7 +70,8 @@ const EditorPage = () => {
 
       // 파일 내용 + 지시사항 결합
       const fullPrompt = `${commonDirective}\n${fileContents.join('\n')}\n${prompt}`;
-
+      console.log('######', fullPrompt)
+      return;
       // GPT 호출
       const completion = await openai.chat.completions.create({
         model: 'gpt-4o',
@@ -97,7 +101,7 @@ const EditorPage = () => {
         <h3>Selected Files:</h3>
         <ul>
           {selectedFiles.map((file, index) => (
-            <li key={index}>{`${file.fileName} (${file.absolutePath})`}</li>
+            <li key={index}>{`${file.fileName}`}</li>
           ))}
         </ul>
       </div>
